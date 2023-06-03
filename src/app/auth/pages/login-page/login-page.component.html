@@ -1,0 +1,24 @@
+
+<div class="flex flex-column">
+  <h2 class="text-large mb-4">Login</h2>
+
+  <!-- Aquí, todos los que comiencen con math, son de Material -->
+  <!-- También se puede usar una directiva personalizada en los elementos convencionales -->
+  <mat-form-field>
+    <mat-label>Usuario</mat-label>
+    <input type="text" matInput placeholder="Nombre de usuario">
+  </mat-form-field>
+
+  <mat-form-field>
+    <mat-label>Contraseña</mat-label>
+    <input type="password" matInput placeholder="Contraseña">
+  </mat-form-field>
+
+  <button mat-button mat-flat-button color="primary">
+    Ingresar
+  </button>
+
+  <div class="flex justify-content-end mt-5">
+    <span>¿Aún no tienes una cuenta?</span><a routerLink="/auth/new-account" class="ml-2">Registrate</a>
+  </div>
+</div>
