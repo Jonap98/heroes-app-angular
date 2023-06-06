@@ -1,4 +1,10 @@
-import { Component } from '@angular/core';
+import { Component, OnInit } from '@angular/core';
+import { ActivatedRoute, Router } from '@angular/router';
+import { FormControl, FormGroup } from '@angular/forms';
+
+import { HeroesService } from '../../services/heroes.service';
+import { Hero, Publisher } from '../../interfaces/hero.interface';
+import { switchMap } from 'rxjs';
 
 @Component({
   selector: 'app-new-page',
@@ -6,7 +12,19 @@ import { Component } from '@angular/core';
   styles: [
   ]
 })
-export class NewPageComponent {
+export class NewPageComponent implements OnInit {
+
+  // Este form aplica las validaciones correspondientes
+  public heroForm = new FormGroup({
+    id: new FormControl<string>(''), // Nullable
+    superhero: new FormControl<string>('', { nonNullable: true }), // Non nullable
+    publisher: new FormControl<Publisher>( Publisher.DCComics ),
+    // publisher: new FormControl<'DC', 'Marvel'>('DC'),
+    alter_ego: new FormControl<string>(''),
+    first_appearance: new FormControl(''),
+    characters: new FormControl(''),
+    alt_img: new FormControl(''),
+  });
 
   public publishers = [
     {
@@ -18,5 +36,55 @@ export class NewPageComponent {
       desc: 'Marvel - Comics'
     },
   ];
+
+  constructor(
+    private heroesService: HeroesService,
+    private activatedRoute: ActivatedRoute,
+    private router: Router
+  ) {}
+
+  ngOnInit(): void {
+    if( !this.router.url.includes('edit') ) return;
+
+    this.activatedRoute.params
+      .pipe(
+        switchMap( ({ id }) => this.heroesService.getHeroById( id ) ),
+      )
+      .subscribe( hero => {
+        if( !hero ) return this.router.navigateByUrl('/');
+
+        // Establecer la info al valor del form
+        this.heroForm.reset( hero );
+
+        return;
+      })
+
+  }
+
+  get currentHero(): Hero {
+    const hero = this.heroForm.value as Hero;
+
+    return hero;
+  }
+
+  onSubmit(): void {
+    if ( this.heroForm.invalid ) return;
+
+    if( this.currentHero.id ) {
+      this.heroesService.updateHero( this.currentHero )
+        .subscribe( hero => {
+          // TODO: mostrar snackbar
+        });
+
+        return;
+    }
+
+    this.heroesService.addHero( this.currentHero )
+      .subscribe( hero => {
+        // Todo. snackbar y navegación
+      })
+
+    this.heroesService.updateHero
+  }
 
 }
